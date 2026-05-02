@@ -157,7 +157,7 @@ function AppChrome({ message }) {
   );
 }
 
-function Home({ darkMode, toggleTheme, reduceMotion, orientation, siteContent }) {
+function Home({ darkMode, toggleTheme, reduceMotion, orientation, siteContent, isLoading }) {
   const navigate = useNavigate();
   const metrics = useMemo(
     () => summarizeProjects(siteContent.projects, siteContent.stats),
@@ -175,6 +175,64 @@ function Home({ darkMode, toggleTheme, reduceMotion, orientation, siteContent })
 
     return `Last sync ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
   }, [siteContent.lastGithubSyncAt]);
+
+  if (isLoading) {
+    return (
+      <div className={`${darkMode ? 'dark' : 'light'} app-shell landing-shell orientation-${orientation} ${reduceMotion ? 'motion-reduced' : ''}`}>
+        <div className="home">
+          <button className='them' onClick={() => toggleTheme()} aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}>
+            {darkMode ? <i className='bx bx-sun'></i> : <i className='bx bx-moon'></i>}
+          </button>
+
+          <div className="orb orb-1"></div>
+          <div className="orb orb-2"></div>
+          <div className="orb orb-3"></div>
+
+          <div className="home-content skeleton-shell" aria-hidden="true">
+            <div className="logo-wrapper skeleton-logo-wrapper">
+              <div className="ui-skeleton ui-skeleton-circle skeleton-logo-core"></div>
+            </div>
+
+            <div className="ui-skeleton ui-skeleton-title skeleton-home-title"></div>
+            <div className="ui-skeleton ui-skeleton-text skeleton-home-subtitle"></div>
+            <div className="ui-skeleton ui-skeleton-text skeleton-home-copy"></div>
+            <div className="ui-skeleton ui-skeleton-text skeleton-home-copy skeleton-home-copy-short"></div>
+
+            <div className="skeleton-pill-row">
+              <div className="ui-skeleton ui-skeleton-pill"></div>
+              <div className="ui-skeleton ui-skeleton-pill"></div>
+              <div className="ui-skeleton ui-skeleton-pill"></div>
+            </div>
+
+            <div className="ui-skeleton ui-skeleton-button skeleton-home-button"></div>
+
+            <div className="hero-insights skeleton-hero-insights">
+              {[0, 1, 2, 3].map((item) => (
+                <div className="hero-insight-card skeleton-card" key={item}>
+                  <div className="ui-skeleton ui-skeleton-text skeleton-card-label"></div>
+                  <div className="ui-skeleton ui-skeleton-text skeleton-card-value"></div>
+                </div>
+              ))}
+            </div>
+
+            <div className="skeleton-pill-row">
+              <div className="ui-skeleton ui-skeleton-pill ui-skeleton-pill-wide"></div>
+              <div className="ui-skeleton ui-skeleton-pill"></div>
+            </div>
+
+            <div className="features skeleton-features">
+              {[0, 1, 2].map((item) => (
+                <div className="feature-item skeleton-feature-item" key={item}>
+                  <div className="ui-skeleton ui-skeleton-icon"></div>
+                  <div className="ui-skeleton ui-skeleton-text skeleton-feature-text"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`${darkMode ? 'dark' : 'light'} app-shell landing-shell orientation-${orientation} ${reduceMotion ? 'motion-reduced' : ''}`}>
@@ -330,6 +388,7 @@ function App() {
     window.innerWidth >= window.innerHeight ? "landscape" : "portrait"
   );
   const [siteContent, setSiteContent] = useState(() => normalizeSiteContent(defaultSiteContent));
+  const [siteLoading, setSiteLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState("");
   const handleSiteContentSaved = useCallback((content) => {
     setSiteContent(normalizeSiteContent(content));
@@ -378,6 +437,10 @@ function App() {
       } catch {
         if (mounted) {
           setSiteContent(normalizeSiteContent(defaultSiteContent));
+        }
+      } finally {
+        if (mounted) {
+          setSiteLoading(false);
         }
       }
     };
@@ -465,6 +528,7 @@ function App() {
             reduceMotion={reduceMotion}
             orientation={orientation}
             siteContent={siteContent}
+            isLoading={siteLoading}
           />
         }
       />
@@ -477,6 +541,7 @@ function App() {
             reduceMotion={reduceMotion}
             toggleMotion={toggleMotion}
             siteContent={siteContent}
+            isLoading={siteLoading}
           />
         }
       />
@@ -489,6 +554,7 @@ function App() {
             reduceMotion={reduceMotion}
             orientation={orientation}
             siteContent={siteContent}
+            isLoading={siteLoading}
           />
         }
       />

@@ -19,7 +19,7 @@ const serviceIcons = [
   "bx-movie-play",
 ];
 
-function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteContent }) {
+function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteContent, isLoading }) {
   const location = useLocation();
   const [activeSection, setActiveSection] = useState(() => {
     return location.state?.section || localStorage.getItem("innovex_dashboard_section") || "home";
@@ -168,6 +168,86 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
     closeEmailModal();
   };
 
+  const renderSkeletonSection = () => {
+    if (activeSection === "projects") {
+      return (
+        <section className="section-content dashboard-skeleton-section" aria-hidden="true">
+          <div className="dashboard-skeleton-head">
+            <div className="ui-skeleton ui-skeleton-text skeleton-chip-line"></div>
+            <div className="ui-skeleton ui-skeleton-title skeleton-panel-title"></div>
+          </div>
+          <div className="projects-grid projects-grid-skeleton">
+            {[0, 1, 2].map((item) => (
+              <div className="project-card project-card-skeleton" key={item}>
+                <div className="project-skeleton-media"></div>
+                <div className="project-skeleton-line project-skeleton-title"></div>
+                <div className="project-skeleton-line"></div>
+                <div className="project-skeleton-line project-skeleton-short"></div>
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+    }
+
+    if (activeSection === "contact") {
+      return (
+        <section className="section-content dashboard-skeleton-section" aria-hidden="true">
+          <div className="dashboard-skeleton-head">
+            <div className="ui-skeleton ui-skeleton-text skeleton-chip-line"></div>
+            <div className="ui-skeleton ui-skeleton-title skeleton-panel-title"></div>
+          </div>
+          <div className="contact-card skeleton-card">
+            <div className="dashboard-skeleton-stack">
+              {[0, 1, 2, 3].map((item) => (
+                <div className="dashboard-skeleton-row" key={item}>
+                  <div className="ui-skeleton ui-skeleton-icon"></div>
+                  <div className="dashboard-skeleton-copy">
+                    <div className="ui-skeleton ui-skeleton-text skeleton-row-label"></div>
+                    <div className="ui-skeleton ui-skeleton-text skeleton-row-value"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    return (
+      <section className="section-content dashboard-skeleton-section" aria-hidden="true">
+        <div className="welcome-card skeleton-card">
+          <div className="ui-skeleton ui-skeleton-title skeleton-panel-title"></div>
+          <div className="ui-skeleton ui-skeleton-text skeleton-panel-copy"></div>
+          <div className="ui-skeleton ui-skeleton-text skeleton-panel-copy skeleton-panel-copy-short"></div>
+        </div>
+
+        <div className="stats-grid">
+          {[0, 1, 2, 3].map((item) => (
+            <div className="stat-card skeleton-card" key={item}>
+              <div className="ui-skeleton ui-skeleton-icon"></div>
+              <div className="stat-content skeleton-stat-copy">
+                <div className="ui-skeleton ui-skeleton-text skeleton-card-label"></div>
+                <div className="ui-skeleton ui-skeleton-text skeleton-card-value"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="analytics-grid">
+          {[0, 1].map((item) => (
+            <div className="analytics-card skeleton-card" key={item}>
+              <div className="ui-skeleton ui-skeleton-text skeleton-chip-line"></div>
+              <div className="ui-skeleton ui-skeleton-title skeleton-analytics-title"></div>
+              <div className="ui-skeleton ui-skeleton-text skeleton-panel-copy"></div>
+              <div className="ui-skeleton ui-skeleton-text skeleton-panel-copy skeleton-panel-copy-short"></div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
   return (
     <div
       className={`${darkMode ? "dark-dashboard" : "light-dashboard"} app-shell ${reduceMotion ? "motion-reduced" : ""}`}
@@ -239,6 +319,9 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
           </header>
 
           <div className="content-area">
+            {isLoading ? (
+              renderSkeletonSection()
+            ) : (
             <div className="section-transition" key={activeSection}>
               {activeSection === "home" && (
                 <section className="section-content home-dashboard-section">
@@ -246,7 +329,7 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
                     <span className="section-chip">Innovexa command center</span>
                     <h2>Build, track, and present your work from one vivid workspace.</h2>
                     <p>
-                      Your home section keeps the essentials close: current portfolio health, quick controls,
+                      Our home section keeps the essentials close: current portfolio health, quick controls,
                       and the next best move for the team.
                     </p>
                     <div className="hero-action-row">
@@ -304,6 +387,8 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
                   <div className="analytics-grid">
                     <div className="analytics-card">
                       <span className="settings-label">Quick controls</span>
+                      <br />
+                      <br />
                       <h3>Personalize this workspace</h3>
                       <p>Switch theme and motion settings anytime while the admin panel handles your site content changes.</p>
                       <div className="settings-actions-stack">
@@ -318,6 +403,8 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
 
                     <div className="analytics-card">
                       <span className="settings-label">Spotlight</span>
+                      <br />
+                      <br />
                       <h3>{displayMetrics.topProject ? displayMetrics.topProject.name : "No showcase project yet"}</h3>
                       <p>
                         {displayMetrics.topProject
@@ -333,7 +420,7 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
                 <section className="section-content dashboard-section">
                   <div className="welcome-card">
                     <h2>Welcome to Your Dashboard</h2>
-                    <p>Manage your projects, monitor delivery health, and keep your workspace polished across every screen.</p>
+                    <p>Real time updates on our projects and performance metrics.</p>
                   </div>
 
                     <div className="dashboard-spotlight-grid">
@@ -378,7 +465,7 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
                           <span className="about-motive-label">Vision</span>
                           <h3>Grow from student builders to trusted creators</h3>
                           <p>
-                            Their vision is to create impactful digital products, keep improving with every project,
+                            Our vision is to create impactful digital products, keep improving with every project,
                             and become a respected technology team known for reliability, creativity, and steady growth.
                           </p>
                         </article>
@@ -390,7 +477,7 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
                           <span className="about-motive-label">Mission</span>
                           <h3>Deliver with consistency, learning, and care</h3>
                           <p>
-                            Their mission is to combine practical development, continuous learning, and honest
+                            Our mission is to combine practical development, continuous learning, and honest
                             collaboration so every project reflects the effort and ambition they share as partners.
                           </p>
                         </article>
@@ -587,8 +674,9 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
                     </div>
                   </div>
                 </section>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </main>
       </div>

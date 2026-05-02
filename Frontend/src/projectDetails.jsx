@@ -4,7 +4,7 @@ import "./App.css";
 import { getProjectDemoLink, hasDedicatedProjectDemo, normalizeProject } from "./siteContent.js";
 import { getProjectVideoSource } from "./projectMedia.js";
 
-function ProjectDetails({ darkMode, toggleTheme, reduceMotion, orientation, siteContent }) {
+function ProjectDetails({ darkMode, toggleTheme, reduceMotion, orientation, siteContent, isLoading }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
@@ -54,6 +54,45 @@ function ProjectDetails({ darkMode, toggleTheme, reduceMotion, orientation, site
 
   const demoLink = useMemo(() => (project?.demoUrl ? getProjectDemoLink(project) : ""), [project]);
   const projectVideo = useMemo(() => getProjectVideoSource(project), [project]);
+
+  if (isLoading && !project) {
+    return (
+      <div className={`${darkMode ? "dark-dashboard" : "light-dashboard"} app-shell page-shell orientation-${orientation} ${reduceMotion ? "motion-reduced" : ""}`}>
+        <div className="project-details-page project-details-page-clean" aria-hidden="true">
+          <header className="project-details-topbar">
+            <div className="ui-skeleton ui-skeleton-button skeleton-back-button"></div>
+            <div className="ui-skeleton ui-skeleton-pill"></div>
+          </header>
+
+          <section className="project-details-card project-details-card-clean skeleton-card">
+            <div className="project-details-layout">
+              <div className="project-details-media">
+                <div className="project-details-screenshot-frame project-details-screenshot-frame-clean project-details-screenshot-single project-details-video-empty"></div>
+                <div className="project-details-mini-stats">
+                  <div className="project-mini-stat skeleton-card">
+                    <div className="ui-skeleton ui-skeleton-text skeleton-row-label"></div>
+                    <div className="ui-skeleton ui-skeleton-text skeleton-card-value"></div>
+                  </div>
+                  <div className="project-mini-stat skeleton-card">
+                    <div className="ui-skeleton ui-skeleton-text skeleton-row-label"></div>
+                    <div className="ui-skeleton ui-skeleton-text skeleton-card-value"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="project-details-main">
+                <div className="ui-skeleton ui-skeleton-text skeleton-chip-line"></div>
+                <div className="ui-skeleton ui-skeleton-title skeleton-panel-title"></div>
+                <div className="ui-skeleton ui-skeleton-text skeleton-panel-copy"></div>
+                <div className="ui-skeleton ui-skeleton-text skeleton-panel-copy skeleton-panel-copy-short"></div>
+                <div className="ui-skeleton ui-skeleton-bar"></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    );
+  }
 
   if (!project) {
     return (
