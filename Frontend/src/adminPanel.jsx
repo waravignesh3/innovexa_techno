@@ -335,7 +335,7 @@ function AdminPanel({ darkMode, toggleTheme, siteContent, onSiteContentSaved }) 
                 <div className="ap-input-wrap">
                   <i className="bx bx-lock-alt ap-input-icon" />
                   <input
-                    className="ap-input"
+                    className="ap-input ap-input--icon"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
