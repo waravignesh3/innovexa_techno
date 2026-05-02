@@ -372,17 +372,24 @@
 }
 .ap-input-icon {
   position: absolute;
-  left: 13px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1.05rem;
+  font-size: 1rem;
   color: var(--text-muted);
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
   line-height: 1;
+  width: 18px;
+  text-align: center;
 }
-/* enough left padding so typed text never sits under the icon */
-.ap-input--icon { padding-left: 40px; }
+/* Override App.css admin-form-grid input padding when icon is present */
+.ap-input--icon,
+.admin-login-form input.ap-input--icon,
+.admin-form-grid input.ap-input--icon,
+.ap-input-wrap input.ap-input--icon {
+  padding-left: 44px !important;
+}
 
 /* ── Label row & char count ───────────────────────────────────────────────── */
 .admin-form-label {
