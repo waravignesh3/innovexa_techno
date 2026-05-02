@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 const siteContentPath = path.join(__dirname, "data", "siteContent.json");
 
 const app = express();
-const port = 3000;
+const port = Number(process.env.PORT) || 3000;
 const adminPassword = process.env.ADMIN_PANEL_PASSWORD || "innovex@admin";
 const adminSessions = new Map();
 const viewerWindowMs = 15 * 60 * 1000;
