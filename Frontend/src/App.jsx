@@ -1,14 +1,14 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
+import { Routes, useNavigate, Route, useLocation } from 'react-router-dom'
 import './App.css'
+import logo from './assets/Innovex_Logo.jpeg'
+import AdminPanel from './adminPanel.jsx'
+import { defaultSiteContent, fetchSiteContent, normalizeSiteContent, summarizeProjects } from './siteContent.js'
+import { PROJECT_SYNC_INTERVAL_MS } from './projectData.js'
+import { API_BASE_URL, API_ENDPOINTS } from './config.js'
 
 const Dashboard = lazy(() => import('./dashboard.jsx'))
 const ProjectDetails = lazy(() => import('./projectDetails.jsx'))
-const AdminPanel = lazy(() => import('./adminPanel.jsx'))
-import logo from "./assets/Innovex_Logo.jpeg";
-import { Routes, useNavigate, Route, useLocation } from 'react-router-dom';
-import { defaultSiteContent, fetchSiteContent, normalizeSiteContent, summarizeProjects } from "./siteContent.js";
-import { PROJECT_SYNC_INTERVAL_MS } from "./projectData.js";
-import { API_BASE_URL, API_ENDPOINTS } from "./config.js";
 
 const LAST_ROUTE_KEY = "innovex_last_route";
 const VIEWER_KEY = "innovex_viewer_id";
@@ -507,7 +507,7 @@ function App() {
     const viewerId = localStorage.getItem(VIEWER_KEY) || crypto.randomUUID();
     localStorage.setItem(VIEWER_KEY, viewerId);
 
-    if (location.pathname === "/admin_panel") {
+    if (location.pathname === "/admin_panel" || location.pathname === "/admin-panel") {
       return;
     }
 
@@ -570,6 +570,17 @@ function App() {
         />
         <Route
           path="/admin_panel"
+          element={
+            <AdminPanel
+              darkMode={darkMode}
+              toggleTheme={toggleTheme}
+              siteContent={siteContent}
+              onSiteContentSaved={handleSiteContentSaved}
+            />
+          }
+        />
+        <Route
+          path="/admin-panel"
           element={
             <AdminPanel
               darkMode={darkMode}

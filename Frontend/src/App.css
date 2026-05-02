@@ -512,7 +512,7 @@ body,
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(12px);
-  animation: panelDrift 4.6s ease-in-out infinite;
+  animation: panelDrift 2.4s ease-in-out infinite;
 }
 
 .hero-insight-label {
@@ -654,7 +654,7 @@ body,
   color: var(--text-secondary);
   transition: background-color 0.2s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)), border-color 0.2s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)), box-shadow 0.2s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1));
   backdrop-filter: blur(6px);
-  animation: floatY 3.5s ease-in-out infinite;
+  animation: floatY 2.2s ease-in-out infinite;
 }
 
 .feature-item:hover {
@@ -705,10 +705,10 @@ button:active {
 
 @keyframes logoFloat {
   0%, 100% {
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
   50% {
-    transform: translateY(-8px);
+    transform: translate3d(0, -4px, 0);
   }
 }
 
@@ -765,10 +765,10 @@ button:active {
 
 @keyframes panelDrift {
   0%, 100% {
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
   50% {
-    transform: translateY(-6px);
+    transform: translate3d(0, -3px, 0);
   }
 }
 
@@ -838,8 +838,8 @@ button:active {
 }
 
 @keyframes floatY {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-7px); }
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(0, -3px, 0); }
 }
 
 @keyframes sectionFadeSlide {
@@ -1306,23 +1306,29 @@ button:active {
   border: 1.5px solid var(--surface-border);
   border-radius: 14px;
   padding: 22px;
-  transition: all 0.3s ease;
+  transition:
+    border-color 0.16s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)),
+    box-shadow 0.16s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)),
+    filter 0.16s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)),
+    transform 0.16s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1));
   cursor: pointer;
   backdrop-filter: blur(10px);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  animation: floatY 6s ease-in-out infinite;
+  animation: floatY 2.2s ease-in-out infinite;
 }
 
 .stat-card:hover {
+  animation: none;
+  transform: translate3d(0, -4px, 0);
   border-color: #646cff;
   box-shadow: 0 12px 30px rgba(100, 108, 255, 0.18), 0 0 30px rgba(99, 102, 241, 0.16);
   filter: saturate(1.05);
 }
 
 .stats-grid .stat-card:nth-child(1) { animation-delay: 0s; }
-.stats-grid .stat-card:nth-child(2) { animation-delay: 0.8s; }
-.stats-grid .stat-card:nth-child(3) { animation-delay: 1.6s; }
-.stats-grid .stat-card:nth-child(4) { animation-delay: 2.4s; }
+.stats-grid .stat-card:nth-child(2) { animation-delay: 0.25s; }
+.stats-grid .stat-card:nth-child(3) { animation-delay: 0.5s; }
+.stats-grid .stat-card:nth-child(4) { animation-delay: 0.75s; }
 
 .stat-icon {
   font-size: 2rem;
@@ -1686,11 +1692,11 @@ button:active {
   border-radius: 16px;
   padding: 22px;
   cursor: pointer;
-  animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
-              border-color 0.28s ease,
-              box-shadow 0.28s ease,
-              background 0.28s ease;
+  animation: fadeInUp 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: transform 0.18s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)),
+              border-color 0.18s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)),
+              box-shadow 0.18s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)),
+              background 0.18s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1));
   backdrop-filter: blur(12px) saturate(120%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
   position: relative;
@@ -1707,7 +1713,7 @@ button:active {
 .project-callout-card,
 .project-info-board,
 .project-checks-clean {
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .project-card,
@@ -6023,24 +6029,24 @@ button:active {
   height: auto;
   min-height: 0;
   border-radius: 18px;
-  transform: translateY(16px);
+  transform: translate3d(0, 10px, 0);
   opacity: 0;
   transition:
-    opacity 0.45s ease,
-    transform 0.28s ease,
-    border-color 0.28s ease,
-    box-shadow 0.28s ease,
-    background 0.28s ease;
+    opacity 0.22s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)),
+    transform 0.18s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)),
+    border-color 0.18s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)),
+    box-shadow 0.18s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)),
+    background 0.18s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
 .projects-grid .project-card.project-card-visible,
 .motion-reduced .projects-grid .project-card {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate3d(0, 0, 0);
 }
 
 .projects-grid .project-card:hover {
-  transform: translateY(-6px);
+  transform: translate3d(0, -4px, 0);
   border-color: rgba(34, 211, 238, 0.42);
   box-shadow:
     0 22px 54px rgba(8, 16, 34, 0.24),
@@ -6418,13 +6424,12 @@ button:active {
   box-shadow: var(--shadow-soft, 0 18px 44px rgba(15, 23, 42, 0.16));
 }
 
-.stat-card:hover,
 .analytics-card:hover,
 .welcome-card:hover,
 .spotlight-card:hover,
 .service-tile:hover,
 .contact-card:hover {
-  transform: translateY(-5px);
+  transform: translate3d(0, -4px, 0);
   box-shadow: var(--shadow-lift, 0 24px 70px rgba(15, 23, 42, 0.22));
 }
 
