@@ -1,0 +1,147 @@
+{
+  "home": {
+    "brandName": "Innovexa Techno",
+    "tagline": "Transforming Ideas into Reality",
+    "description": "Fast, Reliable, and Innovative Solutions for Your Business",
+    "statusPills": [
+      "Live Workspace",
+      "Responsive Layout",
+      "Smooth Motion"
+    ],
+    "features": [
+      "Fast",
+      "Secure",
+      "Scalable"
+    ]
+  },
+  "about": {
+    "eyebrow": "About Innovexa Techno",
+    "headline": "Innovate. Integrate. Elevate.",
+    "description": "Innovexa Techno builds practical digital solutions for businesses that want clean execution, dependable engineering, and a sharper visual presence.",
+    "focusTitle": "Software that moves ideas into action",
+    "focusText": "We turn concepts into polished products across web, mobile, presentations, data workflows, and delivery automation.",
+    "processTitle": "Clarity, speed, and ownership",
+    "processText": "Every project is approached with transparent progress, responsive collaboration, and a strong finish from first build to final handoff.",
+    "bannerTitle": "We take care of your web as ours.",
+    "bannerText": "You can discuss your idea with us. We'll help you shape and launch it."
+  },
+  "contact": {
+    "email": "innovexa.techno@gmail.com",
+    "phones": [
+      "9865514692",
+      "9994449892"
+    ],
+    "founders": [
+      "Vigneshwara",
+      "Madhan Sankar"
+    ],
+    "address": [
+      "Innovexa Techno",
+      "Tamil Nadu, India"
+    ],
+    "brandMotto": "INNOVATE • INTEGRATE • ELEVATE"
+  },
+  "services": [
+    "Mobile App Development",
+    "Web Development",
+    "Database Design & Management",
+    "API Handling",
+    "Embedded System Solutions",
+    "Responsive Layout",
+    "Fast Performance",
+    "Poster Design",
+    "PPT Design",
+    "Video Editing"
+  ],
+  "stats": {
+    "totalProjects": 6,
+    "completedProjects": 3,
+    "liveProjects": 3
+  },
+  "projects": [
+    {
+      "id": "project-1",
+      "name": "E-Commerce Platform",
+      "description": "Build a full-featured e-commerce platform with cart, payments, and admin panel.",
+      "status": "In Progress",
+      "progress": 65,
+      "team": 5,
+      "githubUrl": "https://github.com/example/ecommerce-platform",
+      "owner": "Innovexa",
+      "language": "React",
+      "stars": 0,
+      "screenshot": "",
+      "checks": []
+    },
+    {
+      "id": "project-2",
+      "name": "Mobile App",
+      "description": "Cross-platform mobile application built with React Native.",
+      "status": "In Progress",
+      "progress": 45,
+      "team": 4,
+      "githubUrl": "https://github.com/example/mobile-app",
+      "owner": "Innovexa",
+      "language": "React Native",
+      "stars": 0,
+      "screenshot": "",
+      "checks": []
+    },
+    {
+      "id": "project-3",
+      "name": "Analytics Dashboard",
+      "description": "Real-time data visualization and reporting platform.",
+      "status": "Completed",
+      "progress": 100,
+      "team": 3,
+      "githubUrl": "https://github.com/example/analytics-dashboard",
+      "owner": "Innovexa",
+      "language": "JavaScript",
+      "stars": 0,
+      "screenshot": "",
+      "checks": []
+    },
+    {
+      "id": "project-4",
+      "name": "API Development",
+      "description": "RESTful API architecture for scalable microservices.",
+      "status": "Completed",
+      "progress": 100,
+      "team": 6,
+      "githubUrl": "https://github.com/example/api-development",
+      "owner": "Innovexa",
+      "language": "Node.js",
+      "stars": 0,
+      "screenshot": "",
+      "checks": []
+    },
+    {
+      "id": "project-5",
+      "name": "CRM System",
+      "description": "Customer relationship management tool for sales teams.",
+      "status": "In Progress",
+      "progress": 30,
+      "team": 4,
+      "githubUrl": "https://github.com/example/crm-system",
+      "owner": "Innovexa",
+      "language": "Vue",
+      "stars": 0,
+      "screenshot": "",
+      "checks": []
+    },
+    {
+      "id": "project-6",
+      "name": "DevOps Pipeline",
+      "description": "CI/CD automation and cloud deployment infrastructure.",
+      "status": "Completed",
+      "progress": 100,
+      "team": 2,
+      "githubUrl": "https://github.com/example/devops-pipeline",
+      "owner": "Innovexa",
+      "language": "Docker",
+      "stars": 0,
+      "screenshot": "",
+      "checks": []
+    }
+  ]
+}
