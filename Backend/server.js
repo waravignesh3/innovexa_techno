@@ -993,13 +993,23 @@ app.post("/signin", async (req, res) => {
   }
 });
 
+const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/userdata";
+
+if (!process.env.MONGO_URI && process.env.NODE_ENV === "production") {
+  console.error("ERROR: MONGO_URI environment variable is not set. Cannot proceed in production.");
+  process.exit(1);
+}
+
 mongoose
-  .connect("mongodb://localhost:27017/userdata")
+  .connect(mongoUri)
   .then(() => {
     console.log("Connected to MongoDB");
   })
   .catch((err) => {
     console.error("Error connecting to MongoDB:", err);
+    if (process.env.NODE_ENV === "production") {
+      process.exit(1);
+    }
   });
 
 await readSiteContent();
