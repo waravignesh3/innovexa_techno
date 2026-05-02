@@ -30,11 +30,6 @@ function Projects({ siteContent }) {
     }
 
     videoElement.pause();
-    if (videoElement.readyState >= 2) {
-      videoElement.currentTime = 0.05;
-    } else {
-      videoElement.currentTime = 0;
-    }
   };
 
   const playProjectVideo = (videoElement) => {
@@ -42,7 +37,10 @@ function Projects({ siteContent }) {
       return;
     }
 
-    videoElement.currentTime = 0;
+    if (videoElement.readyState >= 2 && videoElement.currentTime < 0.01) {
+      videoElement.currentTime = 0.01;
+    }
+
     const playback = videoElement.play();
 
     if (playback && typeof playback.catch === "function") {
@@ -292,15 +290,16 @@ function Projects({ siteContent }) {
                         }}
                         src={cardVideo}
                         className="project-screenshot-video"
-                        preload="auto"
+                        preload="metadata"
                         muted
                         playsInline
                         loop
-                        onLoadedData={(event) => {
+                        disablePictureInPicture
+                        onLoadedMetadata={(event) => {
                           const videoElement = event.currentTarget;
                           videoElement.pause();
                           if (videoElement.readyState >= 2) {
-                            videoElement.currentTime = 0.05;
+                            videoElement.currentTime = 0.01;
                           }
                         }}
                       />
