@@ -2,19 +2,25 @@
 // Automatically detects backend URL based on environment
 
 const getApiBaseUrl = () => {
-  // In production, use the same origin (Render serves both frontend and backend)
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-    // For Render deployment, backend is at different domain
-    const isDevelopment = window.location.hostname.includes('localhost') || 
-                         window.location.hostname.includes('127.0.0.1');
-    
-    if (!isDevelopment) {
-      // Extract backend URL from environment or use relative path
-      return window.location.origin.replace(/frontend/, 'backend');
-    }
-  }
-  
   // In development, use localhost:3000
+  if (typeof window === 'undefined') {
+    return 'http://localhost:3000';
+  }
+
+  const hostname = window.location.hostname;
+  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.includes('192.168');
+
+  if (isLocalhost) {
+    // Development environment
+    return 'http://localhost:3000';
+  }
+
+  // Production on Render - use the actual backend URL
+  if (hostname.includes('onrender.com')) {
+    return 'https://innovexa-techno-1.onrender.com';
+  }
+
+  // Fallback for other production environments
   return 'http://localhost:3000';
 };
 
