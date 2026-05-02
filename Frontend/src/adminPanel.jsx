@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import { defaultSiteContent, normalizeSiteContent } from "./siteContent.js";
+import { API_BASE_URL, API_ENDPOINTS } from "./config.js";
 
 const ADMIN_TOKEN_KEY = "innovex_admin_token";
-const API_BASE_URL = "http://localhost:3000";
 
 const arrayFromText = (value) => value.split("\n").map((item) => item.trim()).filter(Boolean);
 
 const getErrorMessage = (error, fallback) => {
   if (error instanceof TypeError) {
-    return "Cannot reach the admin server on http://localhost:3000. Start the backend server and try again.";
+    return `Cannot reach the admin server on ${API_BASE_URL}. Start the backend server and try again.`;
   }
 
   return error.message || fallback;
@@ -60,7 +60,7 @@ function AdminPanel({ darkMode, toggleTheme, siteContent, onSiteContentSaved }) 
     const loadDashboard = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_BASE_URL}/api/admin/dashboard`, {
+        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.adminDashboard}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -97,7 +97,7 @@ function AdminPanel({ darkMode, toggleTheme, siteContent, onSiteContentSaved }) 
 
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api/admin/login`, {
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.adminLogin}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -151,7 +151,7 @@ function AdminPanel({ darkMode, toggleTheme, siteContent, onSiteContentSaved }) 
         services: form.services,
       };
 
-      const response = await fetch(`${API_BASE_URL}/api/admin/site-content`, {
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.adminSiteContent}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -182,7 +182,7 @@ function AdminPanel({ darkMode, toggleTheme, siteContent, onSiteContentSaved }) 
       setError("");
       setSyncMessage("");
 
-      const response = await fetch(`${API_BASE_URL}/api/admin/github/sync`, {
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.adminGithubSync}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

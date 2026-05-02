@@ -1,4 +1,5 @@
 import { defaultProjects, fetchPublicGitHubProjects, normalizeProjects } from "./projectData.js";
+import { API_BASE_URL, API_ENDPOINTS } from "./config.js";
 
 const projectVisualPresets = [
   {
@@ -482,7 +483,8 @@ export const summarizeProjects = (projects = [], stats = null) => {
 export const fetchSiteContent = async ({ forceRefresh = false } = {}) => {
   try {
     const query = forceRefresh ? "?refresh=true" : "";
-    const response = await fetch(`http://localhost:3000/api/site-content${query}`);
+    const url = `${API_BASE_URL}${API_ENDPOINTS.siteContent}${query}`;
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error("Unable to load site content");
     }

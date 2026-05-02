@@ -5,6 +5,7 @@ import { logout } from "./auth/googleauth.js";
 import Projects from "./projects.jsx";
 import logo from "./assets/Innovex_Logo.jpeg";
 import { summarizeProjects } from "./siteContent.js";
+import { API_BASE_URL, API_ENDPOINTS } from "./config.js";
 
 const serviceIcons = [
   "bx-mobile-alt",
@@ -46,7 +47,7 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
 
     const loadOverview = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/realtime/overview");
+        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.realtimeOverview}`);
         if (!response.ok) {
           throw new Error("Unable to load realtime overview.");
         }

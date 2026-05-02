@@ -7,6 +7,7 @@ import logo from "./assets/Innovex_Logo.jpeg";
 import { Routes, useNavigate, Route, useLocation } from 'react-router-dom';
 import { defaultSiteContent, fetchSiteContent, normalizeSiteContent, summarizeProjects } from "./siteContent.js";
 import { PROJECT_SYNC_INTERVAL_MS } from "./projectData.js";
+import { API_BASE_URL, API_ENDPOINTS } from "./config.js";
 
 const LAST_ROUTE_KEY = "innovex_last_route";
 const VIEWER_KEY = "innovex_viewer_id";
@@ -503,7 +504,7 @@ function App() {
       return;
     }
 
-    fetch("http://localhost:3000/api/analytics/view", {
+    fetch(`${API_BASE_URL}${API_ENDPOINTS.analyticsView}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
