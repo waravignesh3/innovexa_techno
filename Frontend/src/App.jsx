@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import './App.css'
-import Dashboard from './dashboard.jsx';
-import ProjectDetails from './projectDetails.jsx';
-import AdminPanel from './adminPanel.jsx';
+
+const Dashboard = lazy(() => import('./dashboard.jsx'))
+const ProjectDetails = lazy(() => import('./projectDetails.jsx'))
+const AdminPanel = lazy(() => import('./adminPanel.jsx'))
 import logo from "./assets/Innovex_Logo.jpeg";
 import { Routes, useNavigate, Route, useLocation } from 'react-router-dom';
 import { defaultSiteContent, fetchSiteContent, normalizeSiteContent, summarizeProjects } from "./siteContent.js";
@@ -11,6 +12,10 @@ import { API_BASE_URL, API_ENDPOINTS } from "./config.js";
 
 const LAST_ROUTE_KEY = "innovex_last_route";
 const VIEWER_KEY = "innovex_viewer_id";
+
+function RouteFallback() {
+  return <div className="route-fallback" aria-hidden="true" />
+}
 
 function AppChrome({ message }) {
   const location = useLocation();
@@ -105,9 +110,9 @@ function AppChrome({ message }) {
         });
       },
       {
-        threshold: 0.12,
+        threshold: 0.06,
         root: rootElement || null,
-        rootMargin: "0px 0px -8% 0px",
+        rootMargin: "0px 0px -4% 0px",
       }
     );
 
@@ -130,11 +135,11 @@ function AppChrome({ message }) {
   const scrollToTop = () => {
     const scrollTarget = document.querySelector(".content-area");
     if (scrollTarget) {
-      scrollTarget.scrollTo({ top: 0, behavior: "smooth" });
+      scrollTarget.scrollTo({ top: 0, behavior: "auto" });
       return;
     }
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "auto" });
   };
 
   return (
@@ -389,7 +394,8 @@ function App() {
     window.innerWidth >= window.innerHeight ? "landscape" : "portrait"
   );
   const [siteContent, setSiteContent] = useState(() => normalizeSiteContent(defaultSiteContent));
-  const [siteLoading, setSiteLoading] = useState(true);
+  const [siteLoading, setSiteLoading] = useState(false);
+  const [siteContentReady, setSiteContentReady] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const handleSiteContentSaved = useCallback((content) => {
     setSiteContent(normalizeSiteContent(content));
@@ -442,6 +448,7 @@ function App() {
       } finally {
         if (mounted) {
           setSiteLoading(false);
+          setSiteContentReady(true);
         }
       }
     };
@@ -519,58 +526,61 @@ function App() {
   return (
     <>
     <AppChrome message={toastMessage} />
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <Home
-            darkMode={darkMode}
-            toggleTheme={toggleTheme}
-            reduceMotion={reduceMotion}
-            orientation={orientation}
-            siteContent={siteContent}
-            isLoading={siteLoading}
-          />
-        }
-      />
-      <Route
-        path="/dashboard"
-        element={
-          <Dashboard
-            darkMode={darkMode}
-            toggleTheme={toggleTheme}
-            reduceMotion={reduceMotion}
-            toggleMotion={toggleMotion}
-            siteContent={siteContent}
-            isLoading={siteLoading}
-          />
-        }
-      />
-      <Route
-        path="/dashboard/project/:id"
-        element={
-          <ProjectDetails
-            darkMode={darkMode}
-            toggleTheme={toggleTheme}
-            reduceMotion={reduceMotion}
-            orientation={orientation}
-            siteContent={siteContent}
-            isLoading={siteLoading}
-          />
-        }
-      />
-      <Route
-        path="/admin_panel"
-        element={
-          <AdminPanel
-            darkMode={darkMode}
-            toggleTheme={toggleTheme}
-            siteContent={siteContent}
-            onSiteContentSaved={handleSiteContentSaved}
-          />
-        }
-      />
-    </Routes>
+    <Suspense fallback={<RouteFallback />}>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Home
+              darkMode={darkMode}
+              toggleTheme={toggleTheme}
+              reduceMotion={reduceMotion}
+              orientation={orientation}
+              siteContent={siteContent}
+              isLoading={siteLoading}
+            />
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <Dashboard
+              darkMode={darkMode}
+              toggleTheme={toggleTheme}
+              reduceMotion={reduceMotion}
+              toggleMotion={toggleMotion}
+              siteContent={siteContent}
+              isLoading={siteLoading}
+            />
+          }
+        />
+        <Route
+          path="/dashboard/project/:id"
+          element={
+            <ProjectDetails
+              darkMode={darkMode}
+              toggleTheme={toggleTheme}
+              reduceMotion={reduceMotion}
+              orientation={orientation}
+              siteContent={siteContent}
+              isLoading={siteLoading}
+              contentReady={siteContentReady}
+            />
+          }
+        />
+        <Route
+          path="/admin_panel"
+          element={
+            <AdminPanel
+              darkMode={darkMode}
+              toggleTheme={toggleTheme}
+              siteContent={siteContent}
+              onSiteContentSaved={handleSiteContentSaved}
+            />
+          }
+        />
+      </Routes>
+    </Suspense>
     </>
   )
 }

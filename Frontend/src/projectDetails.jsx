@@ -4,7 +4,7 @@ import "./App.css";
 import { getProjectDemoLink, hasDedicatedProjectDemo, normalizeProject } from "./siteContent.js";
 import { getProjectVideoSource } from "./projectMedia.js";
 
-function ProjectDetails({ darkMode, toggleTheme, reduceMotion, orientation, siteContent, isLoading }) {
+function ProjectDetails({ darkMode, toggleTheme, reduceMotion, orientation, siteContent, isLoading, contentReady = true }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
@@ -55,7 +55,7 @@ function ProjectDetails({ darkMode, toggleTheme, reduceMotion, orientation, site
   const demoLink = useMemo(() => (project?.demoUrl ? getProjectDemoLink(project) : ""), [project]);
   const projectVideo = useMemo(() => getProjectVideoSource(project), [project]);
 
-  if (isLoading && !project) {
+  if ((!contentReady || isLoading) && !project) {
     return (
       <div className={`${darkMode ? "dark-dashboard" : "light-dashboard"} app-shell page-shell orientation-${orientation} ${reduceMotion ? "motion-reduced" : ""}`}>
         <div className="project-details-page project-details-page-clean" aria-hidden="true">
@@ -94,7 +94,7 @@ function ProjectDetails({ darkMode, toggleTheme, reduceMotion, orientation, site
     );
   }
 
-  if (!project) {
+  if (contentReady && !project) {
     return (
       <div className={`${darkMode ? "dark-dashboard" : "light-dashboard"} app-shell page-shell orientation-${orientation} ${reduceMotion ? "motion-reduced" : ""}`}>
         <div className="project-details-page">

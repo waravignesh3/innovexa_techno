@@ -19,6 +19,9 @@ export default defineConfig({
             if (id.includes('@mui') || id.includes('@emotion')) {
               return 'ui-vendor';
             }
+            if (id.includes('firebase')) {
+              return 'firebase-vendor';
+            }
           }
         },
       },
