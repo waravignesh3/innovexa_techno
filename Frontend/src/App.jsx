@@ -346,31 +346,22 @@ function Home({ darkMode, toggleTheme, reduceMotion, orientation, siteContent, i
             <article className="motive-card motive-card-motive">
               <div className="motive-card-icon" aria-hidden="true">🔥</div>
               <span className="motive-card-kicker">Motive</span>
-              <h3>Purpose that turns ideas into outcomes</h3>
-              <p>
-                Our motive is to help businesses move forward with dependable digital experiences that
-                solve real problems, strengthen trust, and create measurable value.
-              </p>
+              <h3>{siteContent.about.focusTitle}</h3>
+              <p>{siteContent.about.focusText}</p>
             </article>
 
             <article className="motive-card motive-card-vision">
               <div className="motive-card-icon" aria-hidden="true">👁️</div>
               <span className="motive-card-kicker">Vision</span>
-              <h3>Growth shaped by innovation and impact</h3>
-              <p>
-                Our vision is to become a long-term technology partner known for creating modern,
-                scalable solutions that elevate brands and leave a positive digital impact.
-              </p>
+              <h3>{siteContent.about.headline}</h3>
+              <p>{siteContent.about.description}</p>
             </article>
 
             <article className="motive-card motive-card-mission">
               <div className="motive-card-icon" aria-hidden="true">🎯</div>
               <span className="motive-card-kicker">Mission</span>
-              <h3>Execute with precision, speed, and care</h3>
-              <p>
-                Our mission is to combine thoughtful strategy, clean engineering, and collaborative
-                delivery to launch products that are efficient, elegant, and built to last.
-              </p>
+              <h3>{siteContent.about.processTitle}</h3>
+              <p>{siteContent.about.processText}</p>
             </article>
           </div>
         </section>
@@ -394,7 +385,7 @@ function App() {
     window.innerWidth >= window.innerHeight ? "landscape" : "portrait"
   );
   const [siteContent, setSiteContent] = useState(() => normalizeSiteContent(defaultSiteContent));
-  const [siteLoading, setSiteLoading] = useState(false);
+  const [siteLoading, setSiteLoading] = useState(true);
   const [siteContentReady, setSiteContentReady] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const handleSiteContentSaved = useCallback((content) => {
@@ -436,6 +427,10 @@ function App() {
     let mounted = true;
 
     const loadSite = async ({ forceRefresh = false } = {}) => {
+      if (mounted) {
+        setSiteLoading(true);
+      }
+
       try {
         const content = await fetchSiteContent({ forceRefresh });
         if (mounted) {
@@ -457,12 +452,15 @@ function App() {
     const intervalId = window.setInterval(() => {
       loadSite({ forceRefresh: true });
     }, PROJECT_SYNC_INTERVAL_MS);
-    window.addEventListener("innovex-site-updated", loadSite);
+    const handleSiteUpdated = () => {
+      loadSite({ forceRefresh: true });
+    };
+    window.addEventListener("innovex-site-updated", handleSiteUpdated);
 
     return () => {
       mounted = false;
       window.clearInterval(intervalId);
-      window.removeEventListener("innovex-site-updated", loadSite);
+      window.removeEventListener("innovex-site-updated", handleSiteUpdated);
     };
   }, []);
 

@@ -328,11 +328,8 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
                 <section className="section-content home-dashboard-section">
                   <div className="welcome-card welcome-card-hero">
                     <span className="section-chip">Innovexa command center</span>
-                    <h2>Build, track, and present your work from one vivid workspace.</h2>
-                    <p>
-                      Our home section keeps the essentials close: current portfolio health, quick controls,
-                      and the next best move for the team.
-                    </p>
+                    <h2>{siteContent.home.tagline}</h2>
+                    <p>{siteContent.home.description}</p>
                     <div className="hero-action-row">
                       <button className="settings-action-btn" onClick={() => setActiveSection("dashboard")}>
                         Open Dashboard
@@ -420,8 +417,8 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
               {activeSection === "dashboard" && (
                 <section className="section-content dashboard-section">
                   <div className="welcome-card">
-                    <h2>Welcome to Your Dashboard</h2>
-                    <p>Real time updates on our projects and performance metrics.</p>
+                    <h2>{siteContent.home.brandName}</h2>
+                    <p>{siteContent.home.description}</p>
                   </div>
 
                     <div className="dashboard-spotlight-grid">
@@ -440,10 +437,7 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
                       <div className="about-motive-head">
                         <span className="section-chip">Partnership values</span>
                         <h2>Motive, Vision &amp; Mission</h2>
-                        <p>
-                          Innovexa Techno is driven by two hardworking student partners, Vigneshwara and Madhan Sankar,
-                          who are building with discipline, curiosity, and a shared commitment to meaningful digital work.
-                        </p>
+                        <p>{siteContent.about.description}</p>
                       </div>
 
                       <div className="about-motive-grid">
@@ -452,11 +446,8 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
                             <i className="bx bxs-bolt-circle"></i>
                           </div>
                           <span className="about-motive-label">Motive</span>
-                          <h3>Built on hard work and partnership</h3>
-                          <p>
-                            Vigneshwara and Madhan Sankar work as partners with the motive of turning learning,
-                            dedication, and teamwork into real solutions that help clients move forward with confidence.
-                          </p>
+                          <h3>{siteContent.about.focusTitle}</h3>
+                          <p>{siteContent.about.focusText}</p>
                         </article>
 
                         <article className="about-motive-card">
@@ -464,11 +455,8 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
                             <i className="bx bx-show-alt"></i>
                           </div>
                           <span className="about-motive-label">Vision</span>
-                          <h3>Grow from student builders to trusted creators</h3>
-                          <p>
-                            Our vision is to create impactful digital products, keep improving with every project,
-                            and become a respected technology team known for reliability, creativity, and steady growth.
-                          </p>
+                          <h3>{siteContent.about.headline}</h3>
+                          <p>{siteContent.about.bannerText}</p>
                         </article>
 
                         <article className="about-motive-card">
@@ -476,11 +464,8 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
                             <i className="bx bx-target-lock"></i>
                           </div>
                           <span className="about-motive-label">Mission</span>
-                          <h3>Deliver with consistency, learning, and care</h3>
-                          <p>
-                            Our mission is to combine practical development, continuous learning, and honest
-                            collaboration so every project reflects the effort and ambition they share as partners.
-                          </p>
+                          <h3>{siteContent.about.processTitle}</h3>
+                          <p>{siteContent.about.processText}</p>
                         </article>
                       </div>
                     </div>
@@ -611,7 +596,7 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
                   <div className="contact-section-head">
                     <span className="section-chip">Contact Us</span>
                     <h2>Let&apos;s build something together</h2>
-                    <p>Reach out through the details below and we&apos;ll help shape your next project.</p>
+                    <p>{siteContent.about.bannerText}</p>
                   </div>
 
                   <div className="contact-card">

@@ -7,6 +7,7 @@ const normalizeProjectMediaName = (value = "") => String(value)
   .replace(/^-+|-+$/g, "");
 
 const compactProjectMediaName = (value = "") => normalizeProjectMediaName(value).replace(/-/g, "");
+const tokenizeProjectMediaName = (value = "") => normalizeProjectMediaName(value).split("-").filter(Boolean);
 
 const projectVideoEntries = Object.entries(projectVideos).map(([filePath, source]) => {
   const fileName = filePath.split("/").pop() || "";
@@ -15,20 +16,35 @@ const projectVideoEntries = Object.entries(projectVideos).map(([filePath, source
     source,
     normalized: normalizeProjectMediaName(fileName),
     compact: compactProjectMediaName(fileName),
+    tokens: tokenizeProjectMediaName(fileName),
   };
 });
 
 export const getProjectVideoSource = (project) => {
-  const candidates = [
+  const candidateValues = [
     project?.name,
     project?.repositoryName,
     project?.repositoryFullName?.split("/").pop(),
-  ]
-    .filter(Boolean)
-    .flatMap((value) => [normalizeProjectMediaName(value), compactProjectMediaName(value)]);
+  ].filter(Boolean);
+  const candidates = candidateValues.flatMap((value) => [
+    normalizeProjectMediaName(value),
+    compactProjectMediaName(value),
+  ]);
+  const candidateTokens = [...new Set(candidateValues.flatMap((value) => tokenizeProjectMediaName(value)))];
 
   const videoMatch = projectVideoEntries.find(
-    ({ normalized, compact }) => candidates.includes(normalized) || candidates.includes(compact)
+    ({ normalized, compact, tokens }) => {
+      if (candidates.includes(normalized) || candidates.includes(compact)) {
+        return true;
+      }
+
+      if (candidates.some((candidate) => normalized.includes(candidate) || candidate.includes(normalized))) {
+        return true;
+      }
+
+      const sharedTokens = tokens.filter((token) => candidateTokens.includes(token)).length;
+      return sharedTokens >= Math.min(2, tokens.length, candidateTokens.length);
+    }
   );
 
   return videoMatch?.source || null;
