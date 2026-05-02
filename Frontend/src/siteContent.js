@@ -1,6 +1,12 @@
 import { defaultProjects, fetchPublicGitHubProjects, normalizeProjects } from "./projectData.js";
 import { API_BASE_URL, API_ENDPOINTS } from "./config.js";
 
+// ─── Cache keys ───────────────────────────────────────────────────────────────
+const SITE_CONTENT_CACHE_KEY = "innovex_site_content_cache";
+const SITE_CONTENT_CACHE_TS_KEY = "innovex_site_content_cache_ts";
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes — fresh enough, fast enough
+
+// ─── Project visual helpers (unchanged) ───────────────────────────────────────
 const projectVisualPresets = [
   {
     key: "weather",
@@ -411,16 +417,11 @@ export const normalizeSiteContent = (content = {}) => {
 };
 
 export const getProjectScreenshots = (project = {}) => {
-  if (project.private && project.screenshot) {
-    return [project.screenshot];
-  }
-
   if (project.screenshot) {
     return [project.screenshot];
   }
 
   const repoScreenshot = buildGitHubRepoScreenshot(project);
-
   if (repoScreenshot) {
     return [repoScreenshot];
   }
@@ -432,14 +433,10 @@ export const getProjectScreenshot = (project = {}) => getProjectScreenshots(proj
 export const getProjectFallbackScreenshot = (project = {}) => buildAiProjectVisual(project, 0);
 export const getProjectDemoLink = (project = {}) => {
   const demoUrl = String(project.demoUrl || "").trim();
-  if (demoUrl) {
-    return demoUrl;
-  }
+  if (demoUrl) return demoUrl;
 
   const githubUrl = String(project.githubUrl || "").trim();
-  if (githubUrl) {
-    return githubUrl;
-  }
+  if (githubUrl) return githubUrl;
 
   return "";
 };
@@ -460,7 +457,6 @@ export const summarizeProjects = (projects = [], stats = null) => {
   const completedProjects = hasProjectData ? derivedCompletedProjects : (stats?.completedProjects ?? 0);
   const liveProjects = hasProjectData ? derivedLiveProjects : (stats?.liveProjects ?? 0);
   const progressProjects = normalizedProjects.filter((project) => project.status !== "Completed");
-  const totalTeam = normalizedProjects.length ? 2 : 0;
   const averageProgress = progressProjects.length
     ? Math.round(progressProjects.reduce((sum, project) => sum + (project.progress || 0), 0) / progressProjects.length)
     : 0;
@@ -472,12 +468,44 @@ export const summarizeProjects = (projects = [], stats = null) => {
     totalProjects,
     completedProjects,
     liveProjects,
-    totalTeam,
+    totalTeam: normalizedProjects.length ? 2 : 0,
     averageProgress,
     completionRate,
     repoCoverage,
     topProject,
   };
+};
+
+// ─── localStorage cache helpers ───────────────────────────────────────────────
+const readCachedSiteContent = () => {
+  try {
+    const ts = Number(localStorage.getItem(SITE_CONTENT_CACHE_TS_KEY) || "0");
+    if (Date.now() - ts > CACHE_TTL_MS) return null;
+    const raw = localStorage.getItem(SITE_CONTENT_CACHE_KEY);
+    if (!raw) return null;
+    return normalizeSiteContent(JSON.parse(raw));
+  } catch {
+    return null;
+  }
+};
+
+const writeCachedSiteContent = (content) => {
+  try {
+    localStorage.setItem(SITE_CONTENT_CACHE_KEY, JSON.stringify(content));
+    localStorage.setItem(SITE_CONTENT_CACHE_TS_KEY, String(Date.now()));
+  } catch {
+    // Storage quota — silently ignore
+  }
+};
+
+/**
+ * Returns cached content synchronously if fresh, then re-fetches in background.
+ * Callers receive: { cached: content|null, fresh: Promise<content> }
+ */
+export const fetchSiteContentWithCache = () => {
+  const cached = readCachedSiteContent();
+  const fresh = fetchSiteContent({ forceRefresh: true });
+  return { cached, fresh };
 };
 
 export const fetchSiteContent = async ({ forceRefresh = false } = {}) => {
@@ -490,13 +518,21 @@ export const fetchSiteContent = async ({ forceRefresh = false } = {}) => {
     }
 
     const data = await response.json();
-    return normalizeSiteContent(data);
+    const normalized = normalizeSiteContent(data);
+    writeCachedSiteContent(data); // cache raw so normalize runs fresh each time
+    return normalized;
   } catch {
-    const importedProjects = await fetchPublicGitHubProjects();
-
-    return normalizeSiteContent({
-      ...defaultSiteContent,
-      projects: importedProjects,
-    });
+    // Network unavailable — try GitHub fallback and cache it
+    try {
+      const importedProjects = await fetchPublicGitHubProjects();
+      const content = normalizeSiteContent({
+        ...defaultSiteContent,
+        projects: importedProjects,
+      });
+      writeCachedSiteContent({ ...defaultSiteContent, projects: importedProjects });
+      return content;
+    } catch {
+      return normalizeSiteContent(defaultSiteContent);
+    }
   }
 };

@@ -3,7 +3,7 @@ import { Routes, useNavigate, Route, useLocation } from 'react-router-dom'
 import './App.css'
 import logo from './assets/Innovex_Logo.jpeg'
 import AdminPanel from './adminPanel.jsx'
-import { defaultSiteContent, fetchSiteContent, normalizeSiteContent, summarizeProjects } from './siteContent.js'
+import { defaultSiteContent, fetchSiteContent, fetchSiteContentWithCache, normalizeSiteContent, summarizeProjects } from './siteContent.js'
 import { PROJECT_SYNC_INTERVAL_MS } from './projectData.js'
 import { API_BASE_URL, API_ENDPOINTS } from './config.js'
 
@@ -384,10 +384,25 @@ function App() {
   const [orientation, setOrientation] = useState(() =>
     window.innerWidth >= window.innerHeight ? "landscape" : "portrait"
   );
-  const [siteContent, setSiteContent] = useState(() => normalizeSiteContent(defaultSiteContent));
-  const [siteLoading, setSiteLoading] = useState(true);
-  const [siteContentReady, setSiteContentReady] = useState(false);
+
+  // ─── Instant cache-first loading ─────────────────────────────────────────
+  // On mount: read localStorage cache immediately so UI never starts blank.
+  // Then fetch fresh data in background and update.
+  const [siteContent, setSiteContent] = useState(() => {
+    const { cached } = fetchSiteContentWithCache();
+    return cached || normalizeSiteContent(defaultSiteContent);
+  });
+  // isLoading = true only when we have NO cached data AND are still fetching
+  const [siteLoading, setSiteLoading] = useState(() => {
+    const { cached } = fetchSiteContentWithCache();
+    return cached === null; // false when cache exists
+  });
+  const [siteContentReady, setSiteContentReady] = useState(() => {
+    const { cached } = fetchSiteContentWithCache();
+    return cached !== null;
+  });
   const [toastMessage, setToastMessage] = useState("");
+
   const handleSiteContentSaved = useCallback((content) => {
     setSiteContent(normalizeSiteContent(content));
     window.dispatchEvent(new Event("innovex-site-updated"));
@@ -423,11 +438,13 @@ function App() {
     return () => window.clearTimeout(timerId);
   }, [toastMessage]);
 
+  // ─── Background fetch + periodic refresh ─────────────────────────────────
   useEffect(() => {
     let mounted = true;
 
     const loadSite = async ({ forceRefresh = false } = {}) => {
-      if (mounted) {
+      // Only set loading spinner when we have no content at all
+      if (mounted && !siteContentReady) {
         setSiteLoading(true);
       }
 
@@ -435,23 +452,25 @@ function App() {
         const content = await fetchSiteContent({ forceRefresh });
         if (mounted) {
           setSiteContent(content);
+          setSiteLoading(false);
+          setSiteContentReady(true);
         }
       } catch {
         if (mounted) {
           setSiteContent(normalizeSiteContent(defaultSiteContent));
-        }
-      } finally {
-        if (mounted) {
           setSiteLoading(false);
           setSiteContentReady(true);
         }
       }
     };
 
-    loadSite();
+    // Always fetch fresh — but silently (no loading spinner if cache exists)
+    loadSite({ forceRefresh: false });
+
     const intervalId = window.setInterval(() => {
       loadSite({ forceRefresh: true });
     }, PROJECT_SYNC_INTERVAL_MS);
+
     const handleSiteUpdated = () => {
       loadSite({ forceRefresh: true });
     };
@@ -462,7 +481,7 @@ function App() {
       window.clearInterval(intervalId);
       window.removeEventListener("innovex-site-updated", handleSiteUpdated);
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const syncOrientation = () => {
