@@ -19,7 +19,26 @@ const projectCache = new Map();
 
 function ProjectVideoCard({ project, cardVideo, onPlay, onStop }) {
   const videoRef = useRef(null);
+  const containerRef = useRef(null);
   const [videoReady, setVideoReady] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1, rootMargin: "100px" }
+    );
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   const handleRef = useCallback(
     (el) => {
@@ -34,31 +53,33 @@ function ProjectVideoCard({ project, cardVideo, onPlay, onStop }) {
   );
 
   return (
-    <div className="project-screenshot-frame">
+    <div className="project-screenshot-frame" ref={containerRef}>
       {cardVideo ? (
         <>
-          {!videoReady && (
+          {(!videoReady || !isVisible) && (
             <div className="project-video-loading" aria-hidden="true">
               <span className="video-loading-pulse"></span>
             </div>
           )}
-          <video
-            ref={handleRef}
-            src={cardVideo}
-            className={`project-screenshot-video${videoReady ? " video-ready" : ""}`}
-            preload="auto"
-            muted
-            playsInline
-            loop
-            disablePictureInPicture
-            onLoadedData={() => setVideoReady(true)}
-            onLoadedMetadata={(e) => {
-              const el = e.currentTarget;
-              el.pause();
-              if (el.readyState >= 2) el.currentTime = 0.01;
-              setVideoReady(true);
-            }}
-          />
+          {isVisible && (
+            <video
+              ref={handleRef}
+              src={cardVideo}
+              className={`project-screenshot-video${videoReady ? " video-ready" : ""}`}
+              preload="none"
+              muted
+              playsInline
+              loop
+              disablePictureInPicture
+              onLoadedData={() => setVideoReady(true)}
+              onLoadedMetadata={(e) => {
+                const el = e.currentTarget;
+                el.pause();
+                if (el.readyState >= 2) el.currentTime = 0.01;
+                setVideoReady(true);
+              }}
+            />
+          )}
         </>
       ) : (
         <div className="project-video-empty" aria-hidden="true">
@@ -152,59 +173,7 @@ function Projects({ siteContent, isLoading }) {
     });
   }, [filtered, sortBy]);
 
-  // Intersection observer — reveals cards as they scroll into view
-  useEffect(() => {
-    const cards = gridRef.current?.querySelectorAll(".project-card") || [];
-    if (!cards.length) return undefined;
-
-    const rootElement = document.querySelector(".content-area");
-
-    const revealIfVisible = (card) => {
-      const rect = card.getBoundingClientRect();
-      if (rootElement) {
-        const rootRect = rootElement.getBoundingClientRect();
-        if (
-          rect.bottom >= rootRect.top &&
-          rect.top <= rootRect.bottom &&
-          rect.right >= rootRect.left &&
-          rect.left <= rootRect.right
-        ) {
-          card.classList.add("project-card-visible");
-        }
-        return;
-      }
-      if (rect.bottom >= 0 && rect.top <= window.innerHeight) {
-        card.classList.add("project-card-visible");
-      }
-    };
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("project-card-visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.08, root: rootElement || null, rootMargin: "0px 0px -4% 0px" }
-    );
-
-    cards.forEach((card) => {
-      revealIfVisible(card);
-      observer.observe(card);
-    });
-
-    const frameId = window.requestAnimationFrame(() => {
-      cards.forEach((card) => revealIfVisible(card));
-    });
-
-    return () => {
-      window.cancelAnimationFrame(frameId);
-      observer.disconnect();
-    };
-  }, [sortedProjects]);
-
+  // We rely on AppChrome's IntersectionObserver for reveals to reduce overhead
   useEffect(() => () => stopAllProjectVideos(), [stopAllProjectVideos]);
 
   useEffect(() => {

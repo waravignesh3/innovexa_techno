@@ -69,35 +69,6 @@ function AppChrome({ message }) {
       return undefined;
     }
 
-    const revealIfVisible = (target, rootElement) => {
-      const rect = target.getBoundingClientRect();
-
-      if (rootElement) {
-        const rootRect = rootElement.getBoundingClientRect();
-        const intersectsRoot =
-          rect.bottom >= rootRect.top &&
-          rect.top <= rootRect.bottom &&
-          rect.right >= rootRect.left &&
-          rect.left <= rootRect.right;
-
-        if (intersectsRoot) {
-          target.classList.add("is-revealed");
-        }
-
-        return;
-      }
-
-      const intersectsViewport =
-        rect.bottom >= 0 &&
-        rect.top <= window.innerHeight &&
-        rect.right >= 0 &&
-        rect.left <= window.innerWidth;
-
-      if (intersectsViewport) {
-        target.classList.add("is-revealed");
-      }
-    };
-
     const rootElement = document.querySelector(".content-area");
 
     const observer = new IntersectionObserver(
@@ -105,31 +76,27 @@ function AppChrome({ message }) {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("is-revealed");
+            if (entry.target.classList.contains("project-card")) {
+              entry.target.classList.add("project-card-visible");
+            }
             observer.unobserve(entry.target);
           }
         });
       },
       {
-        threshold: 0.06,
+        threshold: 0.05,
         root: rootElement || null,
-        rootMargin: "0px 0px -4% 0px",
+        rootMargin: "0px 0px 50px 0px", // Load slightly before it enters viewport
       }
     );
 
     revealTargets.forEach((target) => {
-      target.classList.remove("is-revealed");
-      revealIfVisible(target, rootElement);
-      observer.observe(target);
+      if (!target.classList.contains("is-revealed")) {
+        observer.observe(target);
+      }
     });
 
-    const frameId = window.requestAnimationFrame(() => {
-      revealTargets.forEach((target) => revealIfVisible(target, rootElement));
-    });
-
-    return () => {
-      window.cancelAnimationFrame(frameId);
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, [location.pathname, sectionRevealVersion]);
 
   const scrollToTop = () => {

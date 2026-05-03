@@ -210,6 +210,26 @@ body,
   will-change: transform;
 }
 
+@media (max-width: 768px) {
+  .orb {
+    animation: none; /* Disable floating on mobile to save CPU/GPU */
+    filter: blur(60px); /* Reduce blur radius for faster rendering */
+  }
+  
+  .home::before,
+  .home::after {
+    animation: none; /* Disable beam sweep on mobile */
+    opacity: 0.3;
+  }
+  
+  .logo-wrapper,
+  .innovexlogo,
+  .logo-ring,
+  .logo-orbit {
+    animation-duration: 15s; /* Slow down animations for better performance */
+  }
+}
+
 .orb-1 {
   width: 420px;
   height: 420px;

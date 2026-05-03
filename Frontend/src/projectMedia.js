@@ -21,30 +21,13 @@ const projectVideoEntries = Object.entries(projectVideos).map(([filePath, source
 });
 
 export const getProjectVideoSource = (project) => {
-  const candidateValues = [
-    project?.name,
-    project?.repositoryName,
-    project?.repositoryFullName?.split("/").pop(),
-  ].filter(Boolean);
-  const candidates = candidateValues.flatMap((value) => [
-    normalizeProjectMediaName(value),
-    compactProjectMediaName(value),
-  ]);
-  const candidateTokens = [...new Set(candidateValues.flatMap((value) => tokenizeProjectMediaName(value)))];
+  const projectName = project?.name || "";
+  const normalizedProjectName = normalizeProjectMediaName(projectName);
+  const compactProjectName = compactProjectMediaName(projectName);
 
   const videoMatch = projectVideoEntries.find(
-    ({ normalized, compact, tokens }) => {
-      if (candidates.includes(normalized) || candidates.includes(compact)) {
-        return true;
-      }
-
-      if (candidates.some((candidate) => normalized.includes(candidate) || candidate.includes(normalized))) {
-        return true;
-      }
-
-      const sharedTokens = tokens.filter((token) => candidateTokens.includes(token)).length;
-      return sharedTokens >= Math.min(2, tokens.length, candidateTokens.length);
-    }
+    ({ normalized, compact }) => 
+      normalized === normalizedProjectName || compact === compactProjectName
   );
 
   return videoMatch?.source || null;
