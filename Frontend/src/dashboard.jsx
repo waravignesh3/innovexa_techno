@@ -34,6 +34,12 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
   useEffect(() => {
     localStorage.setItem("innovex_dashboard_section", activeSection);
     window.dispatchEvent(new Event("innovex-dashboard-section-change"));
+
+    // Reset scroll position to top when section changes
+    const contentArea = document.querySelector(".content-area");
+    if (contentArea) {
+      contentArea.scrollTo({ top: 0, behavior: "auto" });
+    }
   }, [activeSection]);
 
   useEffect(() => {
@@ -86,7 +92,7 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
     topProject: metrics.topProject,
   }), [metrics, liveFeed]);
 
-  const activityFeed = liveFeed?.activity ?? [
+  const activityFeed = useMemo(() => liveFeed?.activity ?? [
     {
       id: "fallback-portfolio",
       title: "Project portfolio refreshed",
@@ -102,7 +108,7 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
       title: "Completion trend updated",
       meta: `${displayMetrics.completionRate}% of projects completed`,
     },
-  ];
+  ], [liveFeed, displayMetrics]);
 
   const sectionMeta = {
     home: {

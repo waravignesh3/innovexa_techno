@@ -474,6 +474,13 @@ function App() {
   useEffect(() => {
     const currentRoute = `${location.pathname}${location.search}${location.hash}`;
     localStorage.setItem(LAST_ROUTE_KEY, currentRoute);
+
+    // Ensure scroll to top on every route change
+    window.scrollTo({ top: 0, behavior: "auto" });
+    const contentArea = document.querySelector(".content-area");
+    if (contentArea) {
+      contentArea.scrollTo({ top: 0, behavior: "auto" });
+    }
   }, [location]);
 
   useEffect(() => {
