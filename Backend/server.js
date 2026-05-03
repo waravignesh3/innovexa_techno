@@ -997,20 +997,36 @@ app.post("/signin", async (req, res) => {
 });
 
 const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/userdata";
+const maskedUri = mongoUri.replace(/\/\/.*:.*@/, "//***:***@");
 
 if (!process.env.MONGO_URI && process.env.NODE_ENV === "production") {
   console.error("ERROR: MONGO_URI environment variable is not set. Cannot proceed in production.");
   process.exit(1);
 }
 
+console.log(`Attempting to connect to MongoDB: ${maskedUri}`);
+
 mongoose
   .connect(mongoUri)
   .then(() => {
-    console.log("Connected to MongoDB");
+    console.log("✓ Connected to MongoDB");
   })
   .catch((err) => {
-    console.error("Error connecting to MongoDB:", err);
+    console.error("✗ MongoDB Connection Error Details:");
+    console.error(`  Message: ${err.message}`);
+    console.error(`  Code: ${err.code}`);
+    console.error(`  CodeName: ${err.codeName}`);
+    
+    if (err.message.includes("authentication failed")) {
+      console.error("\n[HELP] Authentication failed. Please check:");
+      console.error("1. The password in your MONGO_URI is correct.");
+      console.error("2. The username 'waravignesh3_db_user' exists in Atlas Database Access.");
+      console.error("3. The user has 'readWriteAnyDatabase' or 'atlasAdmin' permissions.");
+      console.error("4. Your current IP (or Render's IP) is whitelisted in Atlas Network Access.\n");
+    }
+
     if (process.env.NODE_ENV === "production") {
+      console.error("FATAL: Cannot continue without database connection in production.");
       process.exit(1);
     }
   });

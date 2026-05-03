@@ -1,7 +1,10 @@
-import mongoose from "../../Frontend/node_modules/mongoose/index.js";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
 import ProjectMeta from "../models/projectMeta.js";
 
-const mongoURL = "mongodb://localhost:27017/userdata";
+dotenv.config({ path: "../.env" });
+
+const mongoURL = process.env.MONGO_URI || "mongodb://localhost:27017/userdata";
 
 const libraryManagementSystemProject = {
   repoId: "1225697756",
