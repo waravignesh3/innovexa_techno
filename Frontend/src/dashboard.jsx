@@ -75,7 +75,7 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
     [siteContent]
   );
 
-  const displayMetrics = {
+  const displayMetrics = useMemo(() => ({
     totalProjects: metrics.totalProjects,
     completedProjects: metrics.completedProjects,
     liveProjects: metrics.liveProjects,
@@ -84,7 +84,7 @@ function Dashboard({ darkMode, toggleTheme, reduceMotion, toggleMotion, siteCont
     completionRate: metrics.completionRate,
     releaseWindow: liveFeed?.summary?.releaseWindow ?? "--:--",
     topProject: metrics.topProject,
-  };
+  }), [metrics, liveFeed]);
 
   const activityFeed = liveFeed?.activity ?? [
     {

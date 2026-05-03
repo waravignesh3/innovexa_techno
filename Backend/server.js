@@ -471,6 +471,7 @@ const toPersistedProjectMetadata = (project = {}) => ({
   githubUrl: String(project.githubUrl || ""),
   demoUrl: String(project.demoUrl || project.homepage || ""),
   screenshot: String(project.screenshot || ""),
+  videoUrl: String(project.videoUrl || ""),
   visibility: String(project.visibility || (project.private ? "private" : "public")),
   private: Boolean(project.private),
   defaultBranch: String(project.defaultBranch || ""),
@@ -541,6 +542,7 @@ const loadProjectsFromDatabase = async (owners = githubOwners) => {
     githubUrl: doc.githubUrl,
     demoUrl: doc.demoUrl,
     screenshot: doc.screenshot,
+    videoUrl: doc.videoUrl,
     visibility: doc.visibility,
     private: doc.private,
     defaultBranch: doc.defaultBranch,
@@ -572,6 +574,7 @@ const mergeProjectsWithPersisted = (liveProjects = [], persistedProjects = []) =
       ...project,
       screenshot: project.screenshot || persistedProject?.screenshot || "",
       demoUrl: project.demoUrl || persistedProject?.demoUrl || "",
+      videoUrl: project.videoUrl || persistedProject?.videoUrl || "",
     });
   });
 

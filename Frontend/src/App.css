@@ -213,13 +213,15 @@ body,
 @media (max-width: 768px) {
   .orb {
     animation: none; /* Disable floating on mobile to save CPU/GPU */
-    filter: blur(60px); /* Reduce blur radius for faster rendering */
+    filter: blur(40px); /* Further reduce blur radius for faster rendering */
+    opacity: 0.4;
   }
   
   .home::before,
   .home::after {
     animation: none; /* Disable beam sweep on mobile */
-    opacity: 0.3;
+    opacity: 0.2;
+    display: none; /* Hide expensive beams on mobile */
   }
   
   .logo-wrapper,
@@ -227,6 +229,48 @@ body,
   .logo-ring,
   .logo-orbit {
     animation-duration: 15s; /* Slow down animations for better performance */
+  }
+
+  /* Disable expensive filters on mobile */
+  .home-content,
+  .hero-insight-card,
+  .feature-item,
+  .status-pill,
+  .project-card,
+  .welcome-card,
+  .spotlight-card,
+  .stat-card,
+  .analytics-card,
+  .service-tile {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: rgba(25, 25, 35, 0.9) !important; /* Solid-ish background instead of blur */
+  }
+
+  .dark .home-content,
+  .dark .hero-insight-card,
+  .dark .feature-item,
+  .dark .status-pill,
+  .dark .project-card,
+  .dark .welcome-card,
+  .dark .spotlight-card,
+  .dark .stat-card,
+  .dark .analytics-card,
+  .dark .service-tile {
+    background-color: rgba(15, 15, 22, 0.95) !important;
+  }
+
+  .light .home-content,
+  .light .hero-insight-card,
+  .light .feature-item,
+  .light .status-pill,
+  .light .project-card,
+  .light .welcome-card,
+  .light .spotlight-card,
+  .light .stat-card,
+  .light .analytics-card,
+  .light .service-tile {
+    background-color: rgba(245, 245, 255, 0.95) !important;
   }
 }
 
@@ -6904,6 +6948,20 @@ a:not(.btn-view):not(.btn-demo):hover {
 }
 
 @media (max-width: 768px) {
+  .section-content,
+  .welcome-card,
+  .stat-card,
+  .analytics-card,
+  .spotlight-card,
+  .service-tile,
+  .contact-card,
+  .project-card {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
   .back-to-top {
     right: 14px;
     bottom: 16px;

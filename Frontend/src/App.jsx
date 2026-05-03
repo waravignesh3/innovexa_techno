@@ -53,7 +53,10 @@ function AppChrome({ message }) {
 
   useEffect(() => {
     const handleSectionChange = () => {
-      setSectionRevealVersion((prev) => prev + 1);
+      // Small delay to ensure React has finished rendering the new section
+      setTimeout(() => {
+        setSectionRevealVersion((prev) => prev + 1);
+      }, 150);
     };
 
     window.addEventListener("innovex-dashboard-section-change", handleSectionChange);

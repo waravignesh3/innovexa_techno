@@ -21,6 +21,11 @@ const projectVideoEntries = Object.entries(projectVideos).map(([filePath, source
 });
 
 export const getProjectVideoSource = (project) => {
+  // If the project already has a video URL (e.g. from MongoDB/Backend), use it directly
+  if (project?.videoUrl) {
+    return project.videoUrl;
+  }
+
   const projectName = project?.name || "";
   const normalizedProjectName = normalizeProjectMediaName(projectName);
   const compactProjectName = compactProjectMediaName(projectName);

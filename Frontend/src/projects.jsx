@@ -33,11 +33,18 @@ function ProjectVideoCard({ project, cardVideo, onPlay, onStop }) {
           observer.disconnect();
         }
       },
-      { threshold: 0.1, rootMargin: "100px" }
+      { threshold: 0.01, rootMargin: "300px" } // Larger margin for faster pre-loading
     );
 
     observer.observe(containerRef.current);
-    return () => observer.disconnect();
+
+    // Fallback: if it's not visible after 2 seconds, force it (helps with weird intersection bugs)
+    const timeout = setTimeout(() => setIsVisible(true), 2000);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const handleRef = useCallback(
@@ -66,7 +73,7 @@ function ProjectVideoCard({ project, cardVideo, onPlay, onStop }) {
               ref={handleRef}
               src={cardVideo}
               className={`project-screenshot-video${videoReady ? " video-ready" : ""}`}
-              preload="none"
+              preload="metadata"
               muted
               playsInline
               loop
@@ -75,7 +82,8 @@ function ProjectVideoCard({ project, cardVideo, onPlay, onStop }) {
               onLoadedMetadata={(e) => {
                 const el = e.currentTarget;
                 el.pause();
-                if (el.readyState >= 2) el.currentTime = 0.01;
+                // Ensure a frame is visible immediately
+                if (el.readyState >= 1) el.currentTime = 0.001;
                 setVideoReady(true);
               }}
             />
@@ -506,7 +514,7 @@ function Projects({ siteContent, isLoading }) {
                     muted
                     loop
                     playsInline
-                    preload="auto"
+                    preload="metadata"
                   />
                 ) : (
                   <div

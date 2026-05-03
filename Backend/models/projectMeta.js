@@ -74,6 +74,11 @@ const projectMetaSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    videoUrl: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     visibility: {
       type: String,
       default: "public",
