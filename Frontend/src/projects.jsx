@@ -412,6 +412,12 @@ function Projects({ siteContent, isLoading }) {
                     <i className="bx bx-star"></i>
                     {project.stars ?? 0}
                   </span>
+                  {project.rating > 0 && (
+                    <span className="project-meta-chip project-rating-chip">
+                      <i className="bx bxs-star rating-icon"></i>
+                      {project.rating.toFixed(1)}
+                    </span>
+                  )}
                 </div>
 
                 <div className="project-progress">

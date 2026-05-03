@@ -4726,6 +4726,16 @@ button:active {
   font-weight: 600;
 }
 
+.project-rating-chip {
+  background: rgba(255, 193, 7, 0.12) !important;
+  border-color: rgba(255, 193, 7, 0.25) !important;
+  color: #ffc107 !important;
+}
+
+.rating-icon {
+  color: #ffc107;
+}
+
 @media (max-width: 768px) {
   .hero-action-row {
     gap: 1rem;

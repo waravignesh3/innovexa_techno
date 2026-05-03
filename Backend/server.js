@@ -21,7 +21,7 @@ const port = Number(process.env.PORT) || 3000;
 const adminPassword = process.env.ADMIN_PANEL_PASSWORD || "innovex@admin";
 const adminSessions = new Map();
 const viewerWindowMs = 15 * 60 * 1000;
-const defaultGithubOwners = ["waravignesh3", "Madhan457"];
+const defaultGithubOwners = ["waravignesh3", "madhan457"];
 let githubOwners = [...defaultGithubOwners];
 const pinnedRepositorySeeds = [
   {
@@ -42,6 +42,23 @@ const pinnedRepositorySeeds = [
 const githubApiBase = "https://api.github.com";
 const githubRefreshIntervalMs = 60000;
 const excludedRepoNames = new Set(["innovexa-techno", "innovexa techno", "git"]);
+
+const calculateRating = (repo) => {
+  const stars = repo.stargazers_count || 0;
+  const forks = repo.forks_count || 0;
+  const description = repo.description ? 1 : 0;
+  const hasDemo = repo.homepage ? 1 : 0;
+  
+  // Basic rating logic: 0 to 5 stars
+  let rating = 1; // Base rating
+  if (stars > 5) rating += 1;
+  if (forks > 2) rating += 1;
+  if (description) rating += 1;
+  if (hasDemo) rating += 1;
+  
+  return Math.min(5, rating);
+};
+
 const githubAccessToken = process.env.GITHUB_ACCESS_TOKEN || process.env.GITHUB_TOKEN || "";
 const githubSyncSettingsKey = "primary";
 
@@ -162,6 +179,11 @@ const isVisibleProject = (project = {}) => {
     return true;
   }
 
+  // Explicitly ignore innovexa-techno as requested
+  if (projectName === "innovexa-techno" || projectName === "innovexa_techno") {
+    return false;
+  }
+
   const normalizedName = projectName.replace(/[_\s]+/g, "-");
   const compactName = projectName.replace(/[^a-z0-9]/g, "");
   const compactNormalizedName = normalizedName.replace(/[^a-z0-9]/g, "");
@@ -248,7 +270,7 @@ const mapRepositoryToProject = (repo, index) => {
     progress,
     team: 2,
     githubUrl: repo.html_url,
-    demoUrl: repo.homepage || "",
+    demoUrl: "", // Avoid live demo as requested
     screenshot: `https://opengraph.githubassets.com/1/${repo.owner.login}/${repo.name}`,
     owner: repo.owner.login,
     ownerAvatar: repo.owner.avatar_url || "",
@@ -260,6 +282,7 @@ const mapRepositoryToProject = (repo, index) => {
     pushedAt: repo.pushed_at || repo.updated_at,
     stars: repo.stargazers_count || 0,
     forks: repo.forks_count || 0,
+    rating: calculateRating(repo),
     screenshot: repo.private ? "" : `https://opengraph.githubassets.com/1/${repo.owner.login}/${repo.name}`,
     checks: [
       { label: "Repository exists", passed: true },
@@ -479,6 +502,8 @@ const toPersistedProjectMetadata = (project = {}) => ({
   pushedAt: String(project.pushedAt || project.updatedAt || ""),
   stars: asNumber(project.stars, 0),
   forks: asNumber(project.forks, 0),
+  rating: asNumber(project.rating, 0),
+  wasOncePublic: project.visibility === "public" || project.wasOncePublic === true,
   progress: Math.max(0, Math.min(100, asNumber(project.progress, 0))),
   team: 2,
   importOrder: Math.max(0, asNumber(project.importOrder, 0)),
@@ -508,19 +533,9 @@ const persistGithubProjects = async (projects = [], owners = githubOwners) => {
     await ProjectMeta.bulkWrite(operations, { ordered: false });
   }
 
-  if (scopedOwners.length > 0) {
-    const activeRepoIds = operations.map(({ updateOne }) => updateOne.filter.repoId);
-    const staleFilter = activeRepoIds.length > 0
-      ? {
-        $or: [
-          { owner: { $nin: scopedOwners } },
-          { owner: { $in: scopedOwners }, repoId: { $nin: activeRepoIds } },
-        ],
-      }
-      : { owner: { $in: scopedOwners } };
-
-    await ProjectMeta.deleteMany(staleFilter);
-  }
+  // NOTE: We no longer delete projects that are missing from the GitHub sync.
+  // This ensures that even if a repository is made private or deleted on GitHub,
+  // it remains in our MongoDB database and continues to show on the website.
 };
 
 const loadProjectsFromDatabase = async (owners = githubOwners) => {
@@ -550,10 +565,12 @@ const loadProjectsFromDatabase = async (owners = githubOwners) => {
     pushedAt: doc.pushedAt,
     stars: doc.stars,
     forks: doc.forks,
+    rating: doc.rating || 0,
     progress: doc.progress,
     team: doc.team,
     checks: Array.isArray(doc.checks) ? doc.checks : [],
     importOrder: doc.importOrder,
+    wasOncePublic: doc.wasOncePublic,
   }));
 };
 
@@ -575,7 +592,17 @@ const mergeProjectsWithPersisted = (liveProjects = [], persistedProjects = []) =
       screenshot: project.screenshot || persistedProject?.screenshot || "",
       demoUrl: project.demoUrl || persistedProject?.demoUrl || "",
       videoUrl: project.videoUrl || persistedProject?.videoUrl || "",
+      rating: project.rating || persistedProject?.rating || 0,
+      wasOncePublic: project.wasOncePublic || persistedProject?.wasOncePublic || false,
     });
+  });
+
+  // Add projects that are in database but NOT in live fetch (e.g. private/deleted)
+  const liveRepoIds = new Set(liveProjects.map(p => String(p.id)));
+  persistedProjects.forEach(persisted => {
+    if (!liveRepoIds.has(String(persisted.id))) {
+      merged.push(normalizeProject(persisted));
+    }
   });
 
   return merged.sort((a, b) => {
