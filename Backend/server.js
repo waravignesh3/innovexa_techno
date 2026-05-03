@@ -188,15 +188,7 @@ const isVisibleProject = (project = {}) => {
   const compactName = projectName.replace(/[^a-z0-9]/g, "");
   const compactNormalizedName = normalizedName.replace(/[^a-z0-9]/g, "");
 
-  if (
-    compactName.includes("innovexatechno") ||
-    compactName.includes("innovextechno") ||
-    compactNormalizedName.includes("innovexatechno") ||
-    compactNormalizedName.includes("innovextechno")
-  ) {
-    return false;
-  }
-
+  // Remove the overly aggressive name-based filtering that was blocking too many projects
   return !excludedRepoNames.has(projectName) && !excludedRepoNames.has(normalizedName);
 };
 
@@ -426,6 +418,7 @@ const fetchGithubProjects = async () => {
   let allRepos = [];
   let authenticatedRepos = [];
 
+  // 1. Fetch authenticated repositories if token is available
   if (githubAccessToken) {
     try {
       authenticatedRepos = await fetchGithubCollection(
@@ -433,10 +426,11 @@ const fetchGithubProjects = async () => {
         buildGithubHeaders()
       );
     } catch (error) {
-      logGithubSyncFailure(`Authenticated GitHub fetch failed, falling back to public repos: ${error.message}`);
+      logGithubSyncFailure(`Authenticated GitHub fetch failed: ${error.message}`);
     }
   }
 
+  // 2. Fetch public repositories for EACH owner explicitly
   const responses = await Promise.allSettled(
     githubOwners.map(async (owner) => {
       return fetchGithubCollection(
@@ -463,21 +457,26 @@ const fetchGithubProjects = async () => {
 
   if (hitRateLimit) {
     const fallbackBackoffMs = Date.now() + (15 * 60 * 1000);
-    throw createRateLimitError("GitHub API rate limit exceeded for public repository fetch.", fallbackBackoffMs);
+    throw createRateLimitError("GitHub API rate limit exceeded.", fallbackBackoffMs);
   }
 
+  // 3. Merge and deduplicate
   const mergedRepos = [...authenticatedRepos, ...allRepos];
   const dedupedByRepoId = new Map();
+  
   mergedRepos.forEach((repo) => {
-    const key = String(repo?.id || repo?.full_name || "");
-    if (!key) {
-      return;
+    const id = String(repo?.id || "");
+    if (!id) return;
+    
+    // Prioritize authenticated repo data if we have it
+    if (!dedupedByRepoId.has(id)) {
+      dedupedByRepoId.set(id, repo);
     }
-    dedupedByRepoId.set(key, repo);
   });
 
+  // 4. Filter and Map
   return [...dedupedByRepoId.values()]
-    .filter((repo) => !repo.fork)
+    .filter((repo) => !repo.fork && isVisibleProject(repo))
     .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
     .map((repo, index) => mapRepositoryToProject(repo, index));
 };
