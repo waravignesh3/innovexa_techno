@@ -212,7 +212,7 @@ function Projects({ siteContent, isLoading }) {
   return (
     <section className="section-content projects-section">
       <div className="projects-header">
-        <h2>Your Projects</h2>
+        <h2>Our Projects</h2>
         <div className="projects-source-strip">
           <span className="projects-source-pill projects-source-live">
             Imported from connected GitHub profiles
